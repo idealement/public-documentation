@@ -5,6 +5,7 @@
 Le widget Idéalement permet d'afficher le **calcul de l'effort d'épargne** d'un lot immobilier directement sur votre extranet ou votre site web. Il est intégré via une balise `<iframe>` qui charge une page depuis `https://app.idealement.fr`.
 
 Le widget affiche :
+
 - Le **financement du bien** (apport, durée de prêt, taux)
 - Le **calcul de l'effort d'épargne** personnalisable par l'utilisateur
 - Le détail de l'investissement selon la fiscalité applicable
@@ -20,11 +21,13 @@ Avant d'intégrer le widget, votre catalogue de biens doit avoir été importé 
 
 Vous aurez besoin de trois informations pour chaque lot :
 
-| Paramètre | Description | Exemple |
-|-----------|-------------|---------|
+
+| Paramètre    | Description                                        | Exemple          |
+| ------------ | -------------------------------------------------- | ---------------- |
 | `partner_id` | Identifiant de votre source, fourni par Idéalement | `mon_partenaire` |
-| `program_id` | Identifiant du programme dans votre flux | `PRG-001` |
-| `listing_id` | Identifiant du lot dans votre flux | `LOT-042` |
+| `program_id` | Identifiant du programme dans votre flux           | `PRG-001`        |
+| `listing_id` | Identifiant du lot dans votre flux                 | `LOT-042`        |
+
 
 > **Rappel** : Le `program_id` et le `listing_id` correspondent aux identifiants uniques que vous transmettez dans votre flux de données. Consultez la section [Identifiants uniques](guide_generateur_flux.md#identifiants-uniques) du guide des flux pour plus de détails.
 
@@ -74,11 +77,13 @@ L'URL du widget suit le format suivant :
 https://app.idealement.fr/widget/effort/{partner_id}/{program_id}/{listing_id}
 ```
 
-| Segment | Description |
-|---------|-------------|
-| `partner_id` | Identifiant de votre source (fourni par Idéalement) |
+
+| Segment      | Description                                               |
+| ------------ | --------------------------------------------------------- |
+| `partner_id` | Identifiant de votre source (fourni par Idéalement)       |
 | `program_id` | Identifiant du programme tel que transmis dans votre flux |
-| `listing_id` | Identifiant du lot tel que transmis dans votre flux |
+| `listing_id` | Identifiant du lot tel que transmis dans votre flux       |
+
 
 ---
 
@@ -88,34 +93,56 @@ Vous pouvez **pré-configurer** le widget en ajoutant des paramètres dans l'URL
 
 ### Paramètres financiers
 
-| Paramètre | Type | Description | Exemple |
-|-----------|------|-------------|---------|
-| `invest_contribution` | Integer | Apport initial en euros | `10000` |
-| `invest_loan_duration` | Integer | Durée du prêt en années | `20` |
-| `invest_loan_rate` | Float | Taux du prêt (en %) | `3.5` |
-| `invest_guarantee_fee_rate` | Float | Taux des frais de garantie (en %) | `1.0` |
+
+| Paramètre                   | Type    | Description                       | Valeur par défaut |
+| --------------------------- | ------- | --------------------------------- | ----------------- |
+| `invest_contribution`       | Integer | Apport initial en euros           | `0`               |
+| `invest_loan_duration`      | Integer | Durée du prêt en années           | `20`              |
+| `invest_loan_rate`          | Float   | Taux du prêt (en %)               | `4.0`             |
+| `invest_guarantee_fee_rate` | Float   | Taux des frais de garantie (en %) | `1.35`            |
+
 
 ### Paramètre de fiscalité
 
-| Paramètre | Type | Description | Valeurs possibles |
-|-----------|------|-------------|-------------------|
-| `tax_program` | String | Fiscalité à sélectionner par défaut | `pinel`, `no_dispositive`, `no_dispositive_invest`, `no_dispositive_residence`, `lmnp_amortization`, `lmnp_non_gere`, `lmnp_ancien_gere`, `lmnp_ancien`, `nue_propriete`, `lli_nu`, `lli_meuble`, `ptz` |
+
+| Paramètre     | Type   | Description                                                                                                                                                                                                                                                                        | Valeur par défaut             |
+| ------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `tax_program` | String | Fiscalité à sélectionner par défaut. Valeurs possibles : `pinel`, `no_dispositive`, `no_dispositive_invest`, `no_dispositive_residence`, `lmnp_amortization`, `lmnp_non_gere`, `lmnp_ancien_gere`, `lmnp_ancien`, `nue_propriete`, `lli_nu`, `lli_meuble`, `bailleur_prive`, `ptz` | Première fiscalité disponible |
+
 
 > **Note** : Seules les fiscalités **applicables au lot** seront affichées dans le sélecteur. Si la fiscalité demandée en paramètre n'est pas applicable au lot, le widget utilisera la première fiscalité disponible.
 
 ### Paramètres PTZ (Prêt à Taux Zéro)
 
-| Paramètre | Type | Description | Exemple |
-|-----------|------|-------------|---------|
-| `number_of_resident` | Integer | Nombre de résidents du foyer | `2` |
-| `reference_revenue_y2` | Integer | Revenu fiscal de référence N-2 en euros | `45000` |
+
+| Paramètre              | Type    | Description                             | Valeur par défaut |
+| ---------------------- | ------- | --------------------------------------- | ----------------- |
+| `number_of_resident`   | Integer | Nombre de résidents du foyer            | `2`               |
+| `reference_revenue_y2` | Integer | Revenu fiscal de référence N-2 en euros | `50000`           |
+
+
+### Paramètres Bailleur Privé / Déficit Foncier / Nue Propriété
+
+
+| Paramètre               | Type   | Description                                                                         | Valeur par défaut |
+| ----------------------- | ------ | ----------------------------------------------------------------------------------- | ----------------- |
+| `yearly_incomes`        | Float  | Salaires et assimilés annuels en euros                                              | 80000             |
+| `number_of_parts`       | Float  | Nombre de parts fiscales                                                            | 3                 |
+| `marital_situation`     | String | Situation familiale. Valeurs possibles : `celibataire`, `marie`                     | marie             |
+| `yearly_rental_incomes` | Float  | Revenus / Déficits fonciers annuels en euros                                        | 0                 |
+| `statut_bailleur_prive` | String | Statut bailleur privé. Valeurs possibles : `intermediaire`, `social`, `tres_social` | `intermediaire`   |
+
+
+> **Note** : Ces paramètres sont utilisés pour le calcul de l'effort d'épargne en fiscalité **Bailleur Privé**, **Déficit Foncier** et **Nue Propriété**. Si non renseignés, les valeurs par défaut du partenaire seront utilisées.
 
 ### Paramètres d'affichage
 
-| Paramètre | Type | Description | Valeurs |
-|-----------|------|-------------|---------|
-| `reduced_vat` | Boolean | Afficher les prix en TVA réduite | `1` ou `0` |
-| `for_renting` | Boolean | Calculs Hors Dispositif avec mise en location | `1` ou `0` |
+
+| Paramètre     | Type    | Description                                                | Valeur par défaut |
+| ------------- | ------- | ---------------------------------------------------------- | ----------------- |
+| `reduced_vat` | Boolean | Afficher les prix en TVA réduite (`1` ou `0`)              | `0`               |
+| `for_renting` | Boolean | Calculs Hors Dispositif avec mise en location (`1` ou `0`) | `1`               |
+
 
 ### Exemple d'URL avec paramètres
 
@@ -141,6 +168,7 @@ https://app.idealement.fr/widget/effort/mon_partenaire/PRG-001/LOT-042?tax_progr
 ### Calcul interactif
 
 L'utilisateur peut modifier directement dans le widget :
+
 - **L'apport** (montant de l'apport personnel)
 - **La durée du prêt** (en années)
 - **Le taux du prêt**
@@ -186,16 +214,17 @@ Si vous souhaitez une personnalisation spécifique (couleurs, logo, typographie)
 
 ---
 
-
 ## Récapitulatif
 
-| Élément | Valeur |
-|---------|--------|
-| **URL de base** | `https://app.idealement.fr/widget/effort/{partner_id}/{program_id}/{listing_id}` |
-| **Méthode d'intégration** | Balise `<iframe>` |
-| **Hauteur recommandée** | `1000px` |
-| **Largeur recommandée** | `100%` |
-| **Paramètres optionnels** | `tax_program`, `invest_contribution`, `invest_loan_duration`, `invest_loan_rate`, `invest_guarantee_fee_rate`, `number_of_resident`, `reference_revenue_y2`, `reduced_vat`, `for_renting` |
+
+| Élément                   | Valeur                                                                                                                                                                                                                                                                                                |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **URL de base**           | `https://app.idealement.fr/widget/effort/{partner_id}/{program_id}/{listing_id}`                                                                                                                                                                                                                      |
+| **Méthode d'intégration** | Balise `<iframe>`                                                                                                                                                                                                                                                                                     |
+| **Hauteur recommandée**   | `1000px`                                                                                                                                                                                                                                                                                              |
+| **Largeur recommandée**   | `100%`                                                                                                                                                                                                                                                                                                |
+| **Paramètres optionnels** | `tax_program`, `invest_contribution`, `invest_loan_duration`, `invest_loan_rate`, `invest_guarantee_fee_rate`, `number_of_resident`, `reference_revenue_y2`, `yearly_incomes`, `number_of_parts`, `marital_situation`, `yearly_rental_incomes`, `statut_bailleur_prive`, `reduced_vat`, `for_renting` |
+
 
 ---
 
