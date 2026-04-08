@@ -107,7 +107,7 @@ Vous pouvez **pré-configurer** le widget en ajoutant des paramètres dans l'URL
 
 | Paramètre     | Type   | Description                                                                                                                                                                                                                                                                        | Valeur par défaut             |
 | ------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| `tax_program` | String | Fiscalité à sélectionner par défaut. Valeurs possibles : `pinel`, `no_dispositive`, `no_dispositive_invest`, `no_dispositive_residence`, `lmnp_amortization`, `lmnp_non_gere`, `lmnp_ancien_gere`, `lmnp_ancien`, `nue_propriete`, `lli_nu`, `lli_meuble`, `bailleur_prive`, `ptz` | Première fiscalité disponible |
+| `tax_program` | String | Fiscalité à sélectionner par défaut. Valeurs possibles : `pinel`, `no_dispositive`, `no_dispositive_invest`, `no_dispositive_residence`, `lmnp_amortization`, `lmnp_non_gere`, `lmnp_ancien_gere`, `lmnp_ancien`, `nue_propriete`, `lli_nu`, `lli_meuble`, `jeanbrun`, `ptz` | Première fiscalité disponible |
 
 
 > **Note** : Seules les fiscalités **applicables au lot** seront affichées dans le sélecteur. Si la fiscalité demandée en paramètre n'est pas applicable au lot, le widget utilisera la première fiscalité disponible.
@@ -121,19 +121,21 @@ Vous pouvez **pré-configurer** le widget en ajoutant des paramètres dans l'URL
 | `reference_revenue_y2` | Integer | Revenu fiscal de référence N-2 en euros | `50000`           |
 
 
-### Paramètres Bailleur Privé / Déficit Foncier / Nue Propriété
+### Paramètres Jeanbrun / Déficit Foncier / Nue Propriété
 
 
 | Paramètre               | Type   | Description                                                                         | Valeur par défaut |
 | ----------------------- | ------ | ----------------------------------------------------------------------------------- | ----------------- |
 | `yearly_incomes`        | Float  | Salaires et assimilés annuels en euros                                              | 80000             |
 | `number_of_parts`       | Float  | Nombre de parts fiscales                                                            | 3                 |
-| `marital_situation`     | String | Situation familiale. Valeurs possibles : `celibataire`, `marie`                     | marie             |
+| `marital_situation`     | String | Situation familiale. Valeurs possibles : `celibataire`, `marie`, `union_libre`      | marie             |
 | `yearly_rental_incomes` | Float  | Revenus / Déficits fonciers annuels en euros                                        | 0                 |
-| `statut_bailleur_prive` | String | Statut bailleur privé. Valeurs possibles : `intermediaire`, `social`, `tres_social` | `intermediaire`   |
+| `statut_jeanbrun` | String | Statut Jeanbrun. Valeurs possibles : `intermediaire`, `social`, `tres_social` | `intermediaire`   |
 
 
-> **Note** : Ces paramètres sont utilisés pour le calcul de l'effort d'épargne en fiscalité **Bailleur Privé**, **Déficit Foncier** et **Nue Propriété**. Si non renseignés, les valeurs par défaut du partenaire seront utilisées.
+> **Note** : Ces paramètres sont utilisés pour le calcul de l'effort d'épargne en fiscalité **Jeanbrun**, **Déficit Foncier** et **Nue Propriété**. Si non renseignés, les valeurs par défaut du partenaire seront utilisées.
+
+> **Rétrocompatibilité :** Les valeurs `bailleur_prive` (pour `tax_program`) et `statut_bailleur_prive` restent acceptées comme alias.
 
 ### Paramètres d'affichage
 
@@ -141,7 +143,45 @@ Vous pouvez **pré-configurer** le widget en ajoutant des paramètres dans l'URL
 | Paramètre     | Type    | Description                                                | Valeur par défaut |
 | ------------- | ------- | ---------------------------------------------------------- | ----------------- |
 | `reduced_vat` | Boolean | Afficher les prix en TVA réduite (`1` ou `0`)              | `0`               |
-| `for_renting` | Boolean | Calculs Hors Dispositif avec mise en location (`1` ou `0`) | `1`               |
+| `for_renting` | Boolean | **Déprécié.** Utilisez `tax_program=no_dispositive_invest` à la place. Calculs Hors Dispositif avec mise en location (`1` ou `0`) | `1`               |
+
+### Paramètres avancés (optionnels)
+
+Ces paramètres sont acceptés par le widget et peuvent être passés en query string pour pré-configurer des cas plus avancés (selon le partenaire / la fiscalité et l'UI du widget).
+
+#### Frais et assurance de prêt
+
+| Paramètre                    | Type    | Description                               | Valeur par défaut |
+| --------------------------- | ------- | ----------------------------------------- | ----------------- |
+| `invest_loan_insurance_rate`| Float   | Taux d'assurance du prêt (en %)           | `0.36`            |
+| `invest_filing_fees_amount` | Integer | Frais de dossier (en €)                   | `0`               |
+
+#### Prix d'acquisition et frais de notaire
+
+| Paramètre             | Type    | Description                                       | Valeur par défaut |
+| -------------------- | ------- | ------------------------------------------------- | ----------------- |
+| `custom_listing_price` | Integer | Prix du bien utilisé pour la simulation (en €)   | Prix du lot       |
+| `notary_fees_offered`  | Boolean | Frais de notaire offerts (`1` ou `0`)            | `0`               |
+
+#### Parkings (si le programme en propose)
+
+Vous pouvez pré-sélectionner des parkings en passant une liste.
+
+- Format recommandé : `selected_parkings[]=P1&selected_parkings[]=P2`
+- Format alternatif (équivalent) : `profile[selected_parkings][]=P1&profile[selected_parkings][]=P2`
+
+> **Note** : le widget recalculera le prix des parkings si `reduced_vat=1` et que le lot est éligible à une TVA réduite.
+
+#### Prêts bonifiés (jusqu'à 4)
+
+Certains widgets permettent d'ajouter des prêts complémentaires (prêts bonifiés). Chaque prêt \(i\) accepte :
+
+| Paramètre                         | Type    | Description                 | Valeur par défaut |
+| -------------------------------- | ------- | --------------------------- | ----------------- |
+| `invest_bonified_loan_{i}_amount` | Integer | Montant du prêt (en €)      | `0`               |
+| `invest_bonified_loan_{i}_duration` | Integer | Durée du prêt (en années) | `20`              |
+| `invest_bonified_loan_{i}_rate`   | Float   | Taux du prêt (en %)         | `0`               |
+| `invest_bonified_loan_{i}_offset` | Integer | Différé / décalage (mois)   | `0`               |
 
 
 ### Exemple d'URL avec paramètres
@@ -223,7 +263,7 @@ Si vous souhaitez une personnalisation spécifique (couleurs, logo, typographie)
 | **Méthode d'intégration** | Balise `<iframe>`                                                                                                                                                                                                                                                                                     |
 | **Hauteur recommandée**   | `1000px`                                                                                                                                                                                                                                                                                              |
 | **Largeur recommandée**   | `100%`                                                                                                                                                                                                                                                                                                |
-| **Paramètres optionnels** | `tax_program`, `invest_contribution`, `invest_loan_duration`, `invest_loan_rate`, `invest_guarantee_fee_rate`, `number_of_resident`, `reference_revenue_y2`, `yearly_incomes`, `number_of_parts`, `marital_situation`, `yearly_rental_incomes`, `statut_bailleur_prive`, `reduced_vat`, `for_renting` |
+| **Paramètres optionnels** | `tax_program`, `invest_contribution`, `invest_loan_duration`, `invest_loan_rate`, `invest_guarantee_fee_rate`, `number_of_resident`, `reference_revenue_y2`, `yearly_incomes`, `number_of_parts`, `marital_situation`, `yearly_rental_incomes`, `statut_jeanbrun`, `reduced_vat`, `for_renting` |
 
 
 ---
